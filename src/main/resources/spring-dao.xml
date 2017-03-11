@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       	http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/jdbc
+		http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/data/jpa
+    	http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+    	
+    <jpa:repositories base-package="com.mightyjava.dao" />
+    
+    <jdbc:initialize-database data-source="dataSource">
+    	<jdbc:script location="classpath:database/query.sql"/>
+    </jdbc:initialize-database>
+
+	<context:property-placeholder location="classpath:database/db.properties"/>
+	
+	<!-- Database connection settings -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
+		p:url="${db.url}" p:driverClassName="${db.driver}" p:username="${db.username}" p:password="${db.password}" />
+       
+    <!-- Entity Manager Factory -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+    	p:dataSource-ref="dataSource" p:packagesToScan="com.mightyjava.model">
+    	<property name="jpaVendorAdapter">
+    		<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" p:showSql="true"
+    			p:generateDdl="true"/>
+    	</property>
+    </bean>
+    
+    <!-- Transaction -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"
+    	p:entityManagerFactory-ref="entityManagerFactory" />
+    
+    <tx:annotation-driven/>
+</beans>
