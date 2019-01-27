@@ -24,7 +24,7 @@
     	<jdbc:script location="classpath:database/query.sql"/>
     </jdbc:initialize-database>
 
-	<context:property-placeholder location="classpath:database/db.properties"/>
+	<context:property-placeholder location="classpath:database/db.properties, classpath:hibernate/hibernate.properties"/>
 	
 	<!-- Database connection settings -->
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
@@ -33,9 +33,14 @@
     <!-- Entity Manager Factory -->
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
     	p:dataSource-ref="dataSource" p:packagesToScan="com.mightyjava.model">
+    	<property name="jpaProperties">
+    		<props>
+    			<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+    		</props>
+    	</property>
     	<property name="jpaVendorAdapter">
-    		<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" p:showSql="true"
-    			p:generateDdl="true"/>
+    		<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" p:showSql="${hibernate.show_sql}"
+    			p:generateDdl="${hibernate.generateDdl}"/>
     	</property>
     </bean>
     
